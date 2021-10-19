@@ -2,7 +2,7 @@
  * Created by uedc on 2021/10/11.
  */
 
-import { computed, defineComponent, watch, toRef, ref, getCurrentInstance } from '@vue/composition-api'
+import { computed, defineComponent, watch, toRef, ref } from '@vue/composition-api'
 import { tableProps } from './types'
 
 import './table.less';
@@ -18,7 +18,7 @@ export default defineComponent({
       pageSize: 20
     }
   },
-  setup(props, { slots, expose }) {
+  setup(props) {
     // const table = getCurrentInstance()
     const data = toRef(props, 'data')
     let curPage = ref(0),
@@ -81,15 +81,6 @@ export default defineComponent({
 
     columns.value.push.apply(columns.value, props.columns)
 
-    // expose({
-    //   columns,
-    //   showedData,
-    //   curPage,
-    //   totalPage,
-    //   pageSize,
-    //   startInd
-    // })
-
     return () => {
       const TYPE = {
         check: {
@@ -123,16 +114,23 @@ export default defineComponent({
           return;
         }
 
-        let data = showedData.value;
-        data.sort((a, b) => {
+        let curdata = showedData.value;
+
+        curdata.sort(function(b, a) {
           a = a[sortProp.value];
           b = b[sortProp.value];
 
           if (!sortFn) {
             if (sortType.value === '1') {
-              return a > b;
+              if (b === a) {
+                return 0;
+              }
+              return b > a ? 1 : -1;
             } else {
-              return a < b;
+              if (b === a) {
+                return 0;
+              }
+              return b < a ? 1 : -1;
             }
           }
 
@@ -143,10 +141,7 @@ export default defineComponent({
           }
         });
 
-        // TODO 不知道为啥报错
-        setTimeout(()=> {
-          showedData.value = data;
-        }, 100)
+        showedData.value = curdata;
       }
 
       let curType;
