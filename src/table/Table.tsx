@@ -30,6 +30,23 @@ export default defineComponent({
     let sortProp = ref(''),
         sortType = ref('0');
 
+    // 不支持跨页选中
+    let checkedList = ref([]);
+
+    let chekedHeadStatus = computed(()=> {
+      let count = checkedList.value?.length;
+
+      if (count === showedData.value.length) {
+        return 'checked';
+      }
+
+      if (!checkedList.value?.length) {
+        return '';
+      }
+
+      return 'half-checked';
+    });
+
     if (!data.value || !data.value.length) {
       totalPage.value = 0;
       curPage.value = 0;
@@ -84,7 +101,7 @@ export default defineComponent({
     return () => {
       const TYPE = {
         check: {
-          label: (<div class="table-checkbox" onclick={()=>console.log('clickHead')}></div>),
+          label: (<div class={['table-checkbox', chekedHeadStatus.value]} onclick={()=>console.log('clickHead')}></div>),
           template: (<div class="table-checkbox" onclick={()=>console.log('clickRow')}></div>)
         },
         index: {
@@ -144,6 +161,30 @@ export default defineComponent({
         showedData.value = curdata;
       }
 
+      function onClickCheck(e:Event, row) {
+        // 是否选中以数据为准，不以样式为准
+        let ind = checkedList.value.indexOf(row);
+        if (ind > -1) { // 反选
+          checkedList.value.splice(ind, 1);
+          return;
+        }
+
+        //如果已选列表里没有,则是选中
+        checkedList.value.unshift(row);
+      }
+
+      function onClickHeadCheck() {
+
+        // 全选
+        if (checkedList.value.length !== showedData.value.length) {
+          checkedList.value = showedData.value;
+          return;
+        }
+
+        // 清空
+        checkedList.value = [];
+      }
+
       let curType;
       return (
         <div>
@@ -154,6 +195,9 @@ export default defineComponent({
                   columns.value.map(col => {
                     curType = TYPE[col.type];
                     if (curType) {
+                      if (col.type === 'check') {
+                        return <th rowspan="1" colspan="1" class={['table-head_check']} onClick={onClickHeadCheck}>{curType.label}</th>;
+                      }
                       return <th rowspan="1" colspan="1">{curType.label}</th>;
                     }
 
@@ -179,7 +223,7 @@ export default defineComponent({
                   }
 
                   if (col.type === 'check') {
-                    return <td class="table-cell" rowspan="1" colspan="1">{TYPE.check.template}</td>
+                    return <td class="table-cell" rowspan="1" colspan="1"><div class={['table-checkbox', checkedList.value.includes(row) && 'checked']} onClick={(e)=>onClickCheck(e, row)}></div></td>
                   }
 
                   return <td class="table-cell" rowspan="1" colspan="1">{row[col.prop] || '-'}</td>;
@@ -215,25 +259,4 @@ function useColumns() {
     columns,
     registryColumn
   }
-}
-
-function useTableHeads(columns) {
-  const tableHeads = computed(() => {
-    return columns.value.map((columnVM) => {
-      const { prop, label } = columnVM.props
-      return {
-        prop,
-        label
-      }
-    })
-  })
-
-  return {
-    tableHeads
-  }
-}
-
-function parseColumn (vnodes) {
-  const columnVnodes = columnVnodes.filter(vn => ['table-column', 'tableColumn', 'TableColumn'].includes(vn.tag))
-  debugger
 }
