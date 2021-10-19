@@ -2,61 +2,243 @@
  * Created by uedc on 2021/10/11.
  */
 
-import { computed, defineComponent, watch, toRef } from '@vue/composition-api'
-import { TablePublicProps, tableProps } from './types'
+import { computed, defineComponent, watch, toRef, ref, getCurrentInstance } from '@vue/composition-api'
+import { tableProps } from './types'
+
+import './table.less';
 
 export default defineComponent({
   name: 'Table',
   props: tableProps,
   data () {
     return {
-      _data: null
+      showedData: [],
+      curPage: 0,
+      totalPage: 0,
+      pageSize: 20
     }
   },
-  setup(props, { slots }) {
-    const classes = useClasses(props)
+  setup(props, { slots, expose }) {
+    // const table = getCurrentInstance()
     const data = toRef(props, 'data')
+    let curPage = ref(0),
+      totalPage = ref(0),
+      pageSize = ref(20),
+      startInd = ref(0),
+      showedData = ref([]);
 
-    watch (data, (newV) => {
-      updateData(data);
+    let sortProp = ref(''),
+        sortType = ref('0');
+
+    if (!data.value || !data.value.length) {
+      totalPage.value = 0;
+      curPage.value = 0;
+      return;
+    }
+
+    let isMore = data.value.length % pageSize.value > 0;
+    totalPage.value = Math.floor(data.value.length / pageSize.value) + (isMore ? 1 : 0);
+    curPage.value === 0 && (curPage.value = 1);
+
+    watch(data, (newV) => {
+      if (!newV || !newV.length) {
+        totalPage.value = 0;
+        curPage.value = 0;
+        return;
+      }
+
+      let isMore = newV.length % pageSize.value > 0;
+      totalPage.value = Math.floor(newV.length / pageSize.value) + (isMore ? 1 : 0);
+      curPage.value === 0 && (curPage.value = 1);
+    }, {
+      deep: true,
+      immediate: true
     })
 
-    updateData(data);
+    let enablePre = computed(() =>curPage.value > 1);
+    let enableNext = computed(() =>curPage.value < totalPage.value);
+
+    watch(curPage, (newV) => {
+      startInd.value = (curPage.value - 1) * pageSize.value;
+      let endInd = Math.min(startInd.value + pageSize.value, data.value.length);
+      showedData.value = data.value.slice(startInd.value, endInd);
+    }, {
+      immediate: true,
+      deep: true
+    })
+
+    const { columns, registryColumn } = useColumns()
+
+    if (props.multiCheck) {
+      registryColumn({
+        type: 'check'
+      })
+    }
+
+    if (props.localPaging) {
+
+    }
+
+    columns.value.push.apply(columns.value, props.columns)
+
+    // expose({
+    //   columns,
+    //   showedData,
+    //   curPage,
+    //   totalPage,
+    //   pageSize,
+    //   startInd
+    // })
 
     return () => {
-      debugger
+      const TYPE = {
+        check: {
+          label: (<div class="table-checkbox" onclick={()=>console.log('clickHead')}></div>),
+          template: (<div class="table-checkbox" onclick={()=>console.log('clickRow')}></div>)
+        },
+        index: {
+          label: '序号'
+        }
+      }
+
+      const SORT_TEXT = {
+        0: '自然',
+        1: '正序',
+        2: '倒序'
+      }
+
+      function onClickHeadSort(e:Event, sortKey, sortFn) {
+        // 选中新的列排序后从自然状态开始
+        if (sortProp.value !== sortKey) {
+          sortProp.value = sortKey;
+          sortType.value = '0';
+        };
+
+        sortType.value = '' + ((parseInt(sortType.value) + 1) % 3);
+
+        // 回到不排序状态
+        if (sortType.value === '0') {
+          let endInd = Math.min(startInd.value + pageSize.value, data.value.length);
+          showedData.value = data.value.slice(startInd.value, endInd);
+          return;
+        }
+
+        let data = showedData.value;
+        data.sort((a, b) => {
+          a = a[sortProp.value];
+          b = b[sortProp.value];
+
+          if (!sortFn) {
+            if (sortType.value === '1') {
+              return a > b;
+            } else {
+              return a < b;
+            }
+          }
+
+          if (sortType.value === '1') {
+            return sortFn(a, b);
+          } else {
+            return sortFn(b, a);
+          }
+        });
+
+        // TODO 不知道为啥报错
+        setTimeout(()=> {
+          showedData.value = data;
+        }, 100)
+      }
+
+      let curType;
       return (
         <div>
-          <table>
+          <table class="test-table">
             <thead>
               <tr>
-                <th>Header content 1</th>
-                <th>Header content 2</th>
+                {
+                  columns.value.map(col => {
+                    curType = TYPE[col.type];
+                    if (curType) {
+                      return <th rowspan="1" colspan="1">{curType.label}</th>;
+                    }
+
+                    return (<th rowspan="1" colspan="1">
+                      {col.label}
+                      {col.sortAble &&
+                        (<span
+                          class="table-head_sort"
+                          onClick={(e)=>onClickHeadSort(e, col.prop, col.sortFn)}>
+                            {col.prop === sortProp.value ? SORT_TEXT[sortType.value] : '自然'}
+                        </span>)
+                      }
+                    </th>);
+                  })
+                }
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>Body content 1</td>
-                <td>Body content 2</td>
-              </tr>
-            </tbody>
+              {showedData.value.map((row, ind) => {
+                let rowHtml = columns.value.map((col) => {
+                  if (col.type === 'index') {
+                    return <td class="table-cell">{startInd.value + ind + 1}</td>;
+                  }
 
+                  if (col.type === 'check') {
+                    return <td class="table-cell" rowspan="1" colspan="1">{TYPE.check.template}</td>
+                  }
+
+                  return <td class="table-cell" rowspan="1" colspan="1">{row[col.prop] || '-'}</td>;
+                })
+
+                return <tr class="table-row">{rowHtml}</tr>
+              })}
+            </tbody>
           </table>
-          <p class={classes.value}>Hello World. {slots?.default?.()}</p>
+
+          <div class="table-paging-bar" v-if={props.localPaging}>
+            <span class={['paging-btn', !enablePre.value && 'disabled']} onClick={()=>enablePre.value && curPage.value--}>{'<上一页'}</span>
+            <div class="paging-item_wrapper">
+              {new Array(totalPage.value).fill(0).map((v, ind) => {
+                return (<span class={['paging-item', curPage.value === ind + 1 && 'activated']}>{ind + 1}</span>);
+              })}
+            </div>
+            <span class={['paging-btn', !enableNext.value && 'disabled']} onClick={()=>enableNext.value && curPage.value++}>{'下一页>'}</span>
+          </div>
         </div>
       )
     }
   },
 })
 
-function updateData (data) {
+function useColumns() {
+  const columns = ref([])
+  function registryColumn(column) {
+    columns.value.push(column)
+  }
 
+  return {
+    columns,
+    registryColumn
+  }
 }
 
-function useClasses (props: TablePublicProps) {
-  return computed(() => {
-    return {
-      'test-class': props.test,
-    }
+function useTableHeads(columns) {
+  const tableHeads = computed(() => {
+    return columns.value.map((columnVM) => {
+      const { prop, label } = columnVM.props
+      return {
+        prop,
+        label
+      }
+    })
   })
+
+  return {
+    tableHeads
+  }
+}
+
+function parseColumn (vnodes) {
+  const columnVnodes = columnVnodes.filter(vn => ['table-column', 'tableColumn', 'TableColumn'].includes(vn.tag))
+  debugger
 }

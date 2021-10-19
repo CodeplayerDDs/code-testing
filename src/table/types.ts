@@ -33,13 +33,21 @@ export const tableProps = {
     type: Boolean,
     default: false,
   },
-  mutiCheck: {
+  multiCheck: {
     type: Boolean,
     default: false
   },
   data: {
     type: Array,
     default: () => ([])
+  },
+  columns: {
+    type: Array,
+    default: () => ([])
+  },
+  localPaging: {
+    type: Boolean,
+    default: true
   }
 }
 

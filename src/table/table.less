@@ -1,0 +1,61 @@
+.test-table {
+    border: 1px #ccc solid;
+
+    .table-head_sort {
+        cursor: pointer;
+        color: chocolate;
+        font-size: 10px;
+        font-weight: normal;
+        padding-left: 4px;
+    }
+
+    .table-row {
+        padding: 4px;
+        border-bottom: 1px #ccc solid;
+
+        &:last-child {
+            border-bottom: none;
+        }
+    }
+
+    .table-cell {
+        padding: 0 8px;
+    }
+
+    .table-checkbox {
+        display: inline-block;
+        box-sizing: border-box;
+        width: 16px;
+        height: 16px;
+        background-color: #fff;
+        border: #ccc 1px solid;
+
+        &.checked {
+            background-color: #409eff;
+            border-color: #409eff;
+        }
+    }
+}
+
+.table-paging-bar {
+    .paging-btn {
+        cursor: pointer;
+
+        &.disabled {
+            color: #ccc;
+            cursor: auto;
+        }
+    }
+
+    .paging-item_wrapper {
+        display: inline-block;
+        .paging-item {
+            display: inline-block;
+            padding: 8px;
+
+            &.activated {
+                background-color: #409eff;
+            }
+        }
+    }
+}

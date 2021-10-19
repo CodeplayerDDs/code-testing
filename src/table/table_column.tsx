@@ -27,7 +27,7 @@ export default defineComponent({
         <template>
 
           {{
-            default: () =>
+            default: () => 111
           }}
         </template>
       )
