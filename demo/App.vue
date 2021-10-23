@@ -1,9 +1,9 @@
 <template>
   <div>
-    <TestTable class="dsy-test-table" multi-check local-paging :test="test" :columns="columns" :data="data">
-      <table-column title="姓名" prop="name"><template v-slot="{value}">{{value + 1}}</template></table-column>
-      <table-column title="地址" prop="attr">test2</table-column>
-      <table-column title="电话" prop="phone">test3</table-column>
+    <TestTable class="dsy-test-table" enable-multi-check enable-local-paging :test="test" :columns="columns" :data="data">
+      <table-column title="姓名" dataIndex="name"><template v-slot="{value}">{{value + 1}}</template></table-column>
+      <table-column title="地址" dataIndex="attr">test2</table-column>
+      <table-column title="电话" dataIndex="phone">test3</table-column>
     </TestTable>
   </div>
 </template>
@@ -16,24 +16,24 @@ export default defineComponent({
   name: 'App',
   components: {
     TestTable,
-    TableColumn
+    TableColumn,
   },
   data () {
     return {
       columns: [{
-        type: 'index'
+        type: 'index',
       }, {
-        label: '日期',
-        prop: 'date',
-        sortAble: true
+        title: '日期',
+        dataIndex: 'date',
+        enableSort: true,
       }, {
-        label: '姓名',
-        prop: 'name',
-        sortAble: true
+        title: '姓名',
+        dataIndex: 'name',
+        enableSort: true,
       }, {
-        label: '地址',
-        prop: 'address',
-        sortAble: true
+        title: '地址',
+        dataIndex: 'address',
+        enableSort: true,
       }],
       data: [
         {

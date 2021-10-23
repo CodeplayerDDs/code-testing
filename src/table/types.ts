@@ -30,25 +30,29 @@ export type IxPublicPropTypes<O> = O extends object
 // Props 定义在这里
 export const tableProps = {
   test: {
+    type: Boolean as PropType<boolean>,
+    default: false,
+  },
+  enableMultiCheck: {
     type: Boolean,
     default: false,
   },
-  multiCheck: {
-    type: Boolean,
-    default: false
-  },
   data: {
     type: Array,
-    default: () => ([])
+    default: () => ([]),
   },
   columns: {
     type: Array,
-    default: () => ([])
+    default: () => ([]),
   },
-  localPaging: {
+  enableLocalPaging: {
     type: Boolean,
-    default: true
-  }
+    default: true,
+  },
+  defaultSortKey: {
+    type: String,
+    default: '',
+  },
 }
 
 export type TablePublicProps = IxPublicPropTypes<typeof tableProps>

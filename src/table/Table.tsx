@@ -86,13 +86,13 @@ export default defineComponent({
 
     const { columns, registryColumn } = useColumns()
 
-    if (props.multiCheck) {
+    if (props.enableMultiCheck) {
       registryColumn({
         type: 'check'
       })
     }
 
-    if (props.localPaging) {
+    if (props.enableLocalPaging) {
 
     }
 
@@ -101,11 +101,11 @@ export default defineComponent({
     return () => {
       const TYPE = {
         check: {
-          label: (<div class={['table-checkbox', chekedHeadStatus.value]} onclick={()=>console.log('clickHead')}></div>),
+          title: (<div class={['table-checkbox', chekedHeadStatus.value]} onclick={()=>console.log('clickHead')}></div>),
           template: (<div class="table-checkbox" onclick={()=>console.log('clickRow')}></div>)
         },
         index: {
-          label: '序号'
+          title: '序号'
         }
       }
 
@@ -196,18 +196,18 @@ export default defineComponent({
                     curType = TYPE[col.type];
                     if (curType) {
                       if (col.type === 'check') {
-                        return <th rowspan="1" colspan="1" class={['table-head_check']} onClick={onClickHeadCheck}>{curType.label}</th>;
+                        return <th rowspan="1" colspan="1" class={['table-head_check']} onClick={onClickHeadCheck}>{curType.title}</th>;
                       }
-                      return <th rowspan="1" colspan="1">{curType.label}</th>;
+                      return <th rowspan="1" colspan="1">{curType.title}</th>;
                     }
 
                     return (<th rowspan="1" colspan="1">
-                      {col.label}
-                      {col.sortAble &&
+                      {col.title}
+                      {col.enableSort &&
                         (<span
                           class="table-head_sort"
-                          onClick={(e)=>onClickHeadSort(e, col.prop, col.sortFn)}>
-                            {col.prop === sortProp.value ? SORT_TEXT[sortType.value] : '自然'}
+                          onClick={(e)=>onClickHeadSort(e, col.dataIndex, col.sortFn)}>
+                            {col.dataIndex === sortProp.value ? SORT_TEXT[sortType.value] : '自然'}
                         </span>)
                       }
                     </th>);
@@ -226,7 +226,7 @@ export default defineComponent({
                     return <td class="table-cell" rowspan="1" colspan="1"><div class={['table-checkbox', checkedList.value.includes(row) && 'checked']} onClick={(e)=>onClickCheck(e, row)}></div></td>
                   }
 
-                  return <td class="table-cell" rowspan="1" colspan="1">{row[col.prop] || '-'}</td>;
+                  return <td class="table-cell" rowspan="1" colspan="1">{row[col.dataIndex] || '-'}</td>;
                 })
 
                 return <tr class="table-row">{rowHtml}</tr>
@@ -234,7 +234,7 @@ export default defineComponent({
             </tbody>
           </table>
 
-          <div class="table-paging-bar" v-if={props.localPaging}>
+          <div class="table-paging-bar" v-if={props.enableLocalPaging}>
             <span class={['paging-btn', !enablePre.value && 'disabled']} onClick={()=>enablePre.value && curPage.value--}>{'<上一页'}</span>
             <div class="paging-item_wrapper">
               {new Array(totalPage.value).fill(0).map((v, ind) => {
