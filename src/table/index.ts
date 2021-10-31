@@ -4,6 +4,5 @@
 
 // import TestTable from './Table'
 import TestTable from './Tablevue.vue'
-import TableColumn from './table_column'
 
-export { TestTable, TableColumn }
+export { TestTable }
