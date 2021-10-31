@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import type { PropOptions, PropType } from 'vue-types/dist/types'
+
+import type { Ref } from '@vue/composition-api'
+import type { PagingStatus } from '../types'
+
 type Prop<T, D = T> = PropOptions<T, D> | PropType<T>
 type PublicRequiredKeys<T> = {
   [K in keyof T]: T[K] extends { required: true } ? K : never
@@ -27,61 +31,12 @@ export type IxPublicPropTypes<O> = O extends object
   : { [K in string]: any }
 
 
-export interface InnerColumn {
-  type: 'index' | 'check'
-}
-
-export interface ColumnCfg {
-    title?: string
-    dataIndex: string
-    enableSort?: boolean
-}
-
-export type Column = Partial<ColumnCfg> & Partial<InnerColumn>
-
-export interface PagingCfg {
-  pageSize: number
-}
-
-export interface PagingStatus {
-  pageSize: number
-  totalPage: number
-  curPage: number
-  startInd: number
-}
-
 // Props 定义在这里
-export const tableProps = {
-  test: {
-    type: Boolean as PropType<boolean>,
-    default: false,
-  },
-  enableMultiCheck: {
-    type: Boolean,
-    default: false,
-  },
-  data: {
-    type: Array,
-    default: (): any[] => [],
-  },
-  columns: {
-    type: Array as PropType<(InnerColumn | ColumnCfg)[]>,
-    default: ():(InnerColumn | ColumnCfg)[] => ([]),
-  },
-  enableLocalPaging: {
-    type: Boolean,
-    default: true,
-  },
-  pagingCfg: {
-    type: Object as PropType<PagingCfg>,
-    default: ():PagingCfg => ({
-      pageSize: 20,
-    }),
-  },
-  defaultSortKey: {
-    type: String,
-    default: '',
+export const pagingProps = {
+  pagingStatus: {
+    type: Object as PropType<Ref<PagingStatus>>,
+    require: true,
   },
 }
 
-export type TablePublicProps = IxPublicPropTypes<typeof tableProps>
+export type pagingPublicProps = IxPublicPropTypes<typeof pagingProps>

@@ -24,9 +24,9 @@ export default defineComponent({
   },
   data () {
     return {
-      columns: [{
+      columns: [/*{
         type: 'index',
-      }, {
+      }, */{
         title: '日期',
         dataIndex: 'date',
         enableSort: true,
