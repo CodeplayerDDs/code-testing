@@ -27,47 +27,16 @@ export type IxPublicPropTypes<O> = O extends object
   : { [K in string]: any }
 
 
-export interface InnerColumn {
-  type: 'index' | 'check'
-}
-
-export interface ColumnCfg {
-    title?: string
-    dataIndex: string
-    enableSort?: boolean
-}
-
-export type Column = Partial<ColumnCfg> & Partial<InnerColumn>
-
 // Props 定义在这里
-export const tableProps = {
-  test: {
-    type: Boolean as PropType<boolean>,
-    default: false,
+export const rowProps = {
+  rowIndex: {
+    type: Number,
+    default: 0,
   },
-  enableMultiCheck: {
-    type: Boolean,
-    default: false,
-  },
-  data: {
-    type: Array,
-    default: (): any[] => [],
-  },
-  columns: {
-    type: Array as PropType<(InnerColumn | ColumnCfg)[]>,
-    default: ():(InnerColumn | ColumnCfg)[] => ([]),
-  },
-  enableLocalPaging: {
-    type: Boolean,
-    default: true,
-  },
-  defaultSortKey: {
-    type: String,
-    default: '',
+  record: {
+    type: Object,
+    default: (): any => ({}),
   },
 }
 
-export type TablePublicProps = IxPublicPropTypes<typeof tableProps>
-
-
-
+export type RowPublicProps = IxPublicPropTypes<typeof rowProps>

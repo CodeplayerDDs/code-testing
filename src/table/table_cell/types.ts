@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import type { PropOptions, PropType } from 'vue-types/dist/types'
+import { rowProps } from '../table_row/types'
 type Prop<T, D = T> = PropOptions<T, D> | PropType<T>
 type PublicRequiredKeys<T> = {
   [K in keyof T]: T[K] extends { required: true } ? K : never
@@ -27,47 +28,34 @@ export type IxPublicPropTypes<O> = O extends object
   : { [K in string]: any }
 
 
-export interface InnerColumn {
-  type: 'index' | 'check'
-}
+export type CellType = 'bodyCell' | 'headCell';
 
-export interface ColumnCfg {
-    title?: string
-    dataIndex: string
-    enableSort?: boolean
-}
-
-export type Column = Partial<ColumnCfg> & Partial<InnerColumn>
+import type { Column } from '../types'
 
 // Props 定义在这里
-export const tableProps = {
-  test: {
-    type: Boolean as PropType<boolean>,
-    default: false,
-  },
-  enableMultiCheck: {
-    type: Boolean,
-    default: false,
-  },
-  data: {
-    type: Array,
-    default: (): any[] => [],
-  },
-  columns: {
-    type: Array as PropType<(InnerColumn | ColumnCfg)[]>,
-    default: ():(InnerColumn | ColumnCfg)[] => ([]),
-  },
-  enableLocalPaging: {
-    type: Boolean,
-    default: true,
-  },
-  defaultSortKey: {
+export const cellProps = {
+  dataIndex: {
     type: String,
     default: '',
   },
+  value: {
+    default: '',
+  },
+  record: {
+    type: Object,
+    default: (): any => ({}),
+  },
+  type: {
+    type: String as Prop<CellType>,
+    default: 'bodyCell',
+  },
+  columnCfg: {
+    type: Object as Prop<Column>,
+    default: ():Column => ({}),
+  },
 }
 
-export type TablePublicProps = IxPublicPropTypes<typeof tableProps>
+export type CellPublicProps = IxPublicPropTypes<typeof cellProps>
 
 
 
