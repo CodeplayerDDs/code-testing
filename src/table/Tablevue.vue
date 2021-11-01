@@ -8,10 +8,14 @@
             <table-cell v-for="(col, key) in tableColumns"
                         :key="`table-thead-th-${key}`"
                         type="headCell"
-                        :colunm-cfg="col">
-              <slot v-if="!col.type" :name="`head-${col.dataIndex}`" :colunm-cfg="col">
+                        :sortCfg="col.sortCfg"
+                        :sortStatus="sortStatus"
+                        :columnCfg="col">
+              <!-- <slot v-if="!col.type"
+                    :name="`head-${col.dataIndex}`"
+                    :colunm-cfg="col">
                 {{ col.title || '-' }}
-              </slot>
+              </slot> -->
             </table-cell>
           </slot>
         </tr>
@@ -25,19 +29,22 @@
                       :column-cfg="col"
                       :value="rowData[col.dataIndex]"
                       :record="rowData">
+            <!-- 给个客户数据的表格体都支持插槽 -->
             <slot v-if="!col.type"
                   :name="`cell-${col.dataIndex}`"
                   :column-cfg="col"
                   :value="rowData[col.dataIndex]"
                   :record="rowData">
-              {{ rowData[col.dataIndex] }}
+              {{ rowData[col.dataIndex] || '-' }}
             </slot>
           </table-cell>
         </table-row>
       </tbody>
 
       <!-- 底部分页 -->
-      <slot name="pager" v-if="enableLocalPaging">
+      <slot v-if="enableLocalPaging"
+            name="pager"
+            :paging-status="pagingStatus">
         <pager :paging-status="pagingStatus" />
       </slot>
     </table>
@@ -49,18 +56,20 @@
  * Created by uedc on 2021/10/11.
  */
 
-import type { Column, PagingCfg, PagingStatus } from './types'
+import type {
+  Column,
+  PagingCfg, PagingStatus,
+  SortCfg, SortStatus,
+} from './types'
 
 import type { Ref } from '@vue/composition-api'
 
-import { computed, defineComponent, ref, toRef, watch } from '@vue/composition-api'
-import { tableProps } from './types'
+import { computed, defineComponent, ref, toRef, toRefs, watch, watchEffect } from '@vue/composition-api'
+import { SortDir, tableProps } from './types'
 
 import TableRow from './table_row/index.vue'
 import TableCell from './table_cell/index.vue'
 import Pager from './pager/index.vue'
-
-// const cloneDeep = require('lodash/cloneDeep')
 
 import './table.less'
 
@@ -71,15 +80,12 @@ export default defineComponent({
     TableCell,
     Pager,
   },
-  props: tableProps
-
-
-  ,
+  props: tableProps,
   setup(props) {
     let paging = {}
 
     const data = toRef(props, 'data')
-    const showedData = ref(data)
+    const showedData = ref([])
 
     const { tableColumns } = useColumns(props.columns)
 
@@ -87,6 +93,10 @@ export default defineComponent({
       const pagingStatus = usePager(props.pagingCfg, showedData, data)
       paging = { pagingStatus }
     }
+
+    // 开启排序功能
+    const { sortCfg, columns } = toRefs(props)
+    const sortStatus = useSort(sortCfg, columns, showedData)
 
     // const sortProp = ref(''),
     //     sortType = ref('0')
@@ -98,12 +108,16 @@ export default defineComponent({
       showedData,
       tableColumns,
       ...paging,
+      sortStatus,
     }
   },
 })
 
 function useColumns(columnsCfg: Column[]) {
   const tableColumns = ref(computed(() => Array.from(columnsCfg)))
+
+  // TODO 需要处理一些内置列
+
   // function registryColumn(column) {
   //   tableColumns.value.push(column)
   // }
@@ -123,34 +137,98 @@ function usePager<TRecord>(pagingCfg: PagingCfg, showedData: Ref<TRecord[]>, dat
     startInd: 0,
   })
 
-  watch(data, newV => {
-    handlePaging(pagingCfg, pagingStatus, showedData, newV)
+  watch(data, () => {
+    handlePaging(pagingCfg, pagingStatus, showedData, data)
   })
 
   // 当前页变化后，需要重新计算index的开始值，并刷新展示的数据
   watch(() => pagingStatus.value.curPage, () => {
     pagingStatus.value.startInd = (pagingStatus.value.curPage - 1) * pagingStatus.value.pageSize
     const endInd = Math.min(pagingStatus.value.startInd + pagingStatus.value.pageSize, data.value.length)
-    debugger
     showedData.value = data.value.slice(pagingStatus.value.startInd, endInd)
   })
 
-  handlePaging(pagingCfg, pagingStatus, showedData, data.value)
+  handlePaging(pagingCfg, pagingStatus, showedData, data)
 
   return pagingStatus
 }
 
 /** 当数据变化，需要重新计算分页的总数 */
-function handlePaging<TRecord>(pagingCfg: PagingCfg, pagingStatus: Ref<PagingStatus>, showedData: Ref<TRecord[]>, data: TRecord[]) {
-  if (!data || !data.length) {
+function handlePaging<TRecord>(pagingCfg: PagingCfg, pagingStatus: Ref<PagingStatus>, showedData: Ref<TRecord[]>, data: Ref<TRecord[]>) {
+  if (!data.value || !data.value.length) {
     pagingStatus.value.totalPage = 0
     pagingStatus.value.curPage = 0
     return
   }
 
-  const isMore = data.length % pagingCfg.pageSize > 0
-  pagingStatus.value.totalPage = Math.floor(data.length / pagingCfg.pageSize) + (isMore ? 1 : 0)
+  const isMore = data.value.length % pagingCfg.pageSize > 0
+  pagingStatus.value.totalPage = Math.floor(data.value.length / pagingCfg.pageSize) + (isMore ? 1 : 0)
   pagingStatus.value.curPage === 0 && (pagingStatus.value.curPage = 1)
+}
+
+/** 开启排序功能 */
+function useSort<TRecord> (sortCfg: Ref<SortCfg>, columns: Ref<Column<TRecord>[]>, showedData: Ref<TRecord[]>) {
+  const sortStatus: Ref<SortStatus> = ref({
+    sortKey: sortCfg.value.defaultSortKey,
+    sortDir: sortCfg.value.defaultSortDir,
+
+    // TODO deep clone
+    unsortedData: showedData,
+  })
+
+  // watch(() => sortStatus.value.sortKey, () => {
+  //   sortStatus.value.sortDir = SortDir.desc
+  // })
+
+  watch(() => sortStatus.value.sortDir, () => {
+    const sortKey = sortStatus.value.sortKey
+    if (!sortKey) {
+      return
+    }
+
+    const sortColCfg = columns.value.filter(col => col.dataIndex === sortKey)[0]
+    if (!sortColCfg) {
+      console.warn(`Has no column with an same dataIndex as sortKey: ${sortKey}`)
+    }
+
+    let aVal, bVal
+    const sortingFn = (b: TRecord, a: TRecord) => {
+      if (sortColCfg.sortFn) {
+        return sortColCfg.sortFn(b, a)
+      }
+
+      bVal = b[sortKey]
+      // eval('debugger')
+      aVal= a[sortKey]
+
+      if (bVal === aVal) {
+        return 0
+      } else if (bVal > aVal) {
+        return 1
+      }
+
+      return -1
+    }
+
+    switch(sortStatus.value.sortDir) {
+      case SortDir.none:
+        showedData.value.sort((b, a) => sortingFn(b, a))
+        break
+      case SortDir.desc:
+        showedData.value.sort((b, a) => sortingFn(a, b))
+        break
+      case SortDir.asc:
+        showedData.value = sortStatus.value.unsortedData!.value!
+        break
+
+      default:
+        console.error(`Invalide sort dirction: ${sortStatus.value.sortDir}`)
+    }
+  })
+
+  // watchEffect()
+
+  return sortStatus
 }
 
 </script>

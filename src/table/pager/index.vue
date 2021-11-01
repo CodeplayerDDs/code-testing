@@ -1,12 +1,15 @@
 <template>
   <div class="table-paging-bar">
-    <span :class="['paging-btn', {disabled: !enablePre}]" @click="onClickPre">{{ '上一页' }}</span>
-    <div class="paging-item_wrapper">
-      <span v-if="totalPageArr.length"
-            :v-for="(v, ind) in totalPageArr"
-            :class="['paging-item', {activated: curPage === ind + 1}]">{{ ind + 1 }}</span>
+    <span :class="['paging-btn', {disabled: !enablePre}]" @click="onClickPre">上一页</span>
+    <div v-if="totalPageArr.length" class="paging-item_wrapper">
+      <span v-for="(v, ind) in totalPageArr"
+            :key="`paging-item_${ind}`"
+            :class="['paging-item', {activated: curPage === ind + 1}]"
+            @click="onClickItem(ind + 1)">
+        {{ ind + 1 }}
+      </span>
     </div>
-    <span :class="['paging-btn', {disabled: !enableNext}]" @click="onClickNext">{{ '下一页' }}</span>
+    <span :class="['paging-btn', {disabled: !enableNext}]" @click="onClickNext">下一页</span>
   </div>
 </template>
 
@@ -29,14 +32,15 @@ export default defineComponent({
     const totalPageArr = computed(() => new Array(pagingStatus.value.totalPage || 0).fill(0))
 
     const onClickPre = () => {
-      enablePre && pagingStatus.value.curPage--
+      enablePre.value && pagingStatus.value.curPage--
     }
 
     const onClickNext = () => {
-      enableNext && pagingStatus.value.curPage++
+      enableNext.value && pagingStatus.value.curPage++
     }
 
-    debugger
+    const onClickItem = (ind: number) => (pagingStatus.value!.curPage !== ind) && (pagingStatus.value!.curPage = ind)
+
     return {
       totalPageArr,
       curPage,
@@ -44,6 +48,7 @@ export default defineComponent({
       enableNext,
       onClickPre,
       onClickNext,
+      onClickItem,
     }
   },
 })

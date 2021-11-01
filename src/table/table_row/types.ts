@@ -1,32 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-import type { PropOptions, PropType } from 'vue-types/dist/types'
-type Prop<T, D = T> = PropOptions<T, D> | PropType<T>
-type PublicRequiredKeys<T> = {
-  [K in keyof T]: T[K] extends { required: true } ? K : never
-}[keyof T]
-
-type PublicOptionalKeys<T> = Exclude<keyof T, PublicRequiredKeys<T>>
-type InferPropType<T> = T extends null
-  ? any // null & true would fail to infer
-  : T extends { type: null | true }
-    ? any // As TS issue https://github.com/Microsoft/TypeScript/issues/14829 // somehow `ObjectConstructor` when inferred from { (): T } becomes `any` // `BooleanConstructor` when inferred from PropConstructor(with PropMethod) becomes `Boolean`
-    : T extends ObjectConstructor | { type: ObjectConstructor }
-      ? Record<string, any>
-      : T extends BooleanConstructor | { type: BooleanConstructor }
-        ? boolean
-        : T extends Prop<infer V, infer D>
-          ? unknown extends V
-            ? D
-            : V
-          : T
-
-// eslint-disable-next-line @typescript-eslint/ban-types
-export type IxPublicPropTypes<O> = O extends object
-  ? { [K in PublicRequiredKeys<O>]: InferPropType<O[K]> } & { [K in PublicOptionalKeys<O>]?: InferPropType<O[K]> }
-  : { [K in string]: any }
-
-
+/*
+ * @Author: your name
+ * @Date: 2021-11-01 13:47:44
+ * @LastEditTime: 2021-11-01 19:13:28
+ * @LastEditors: your name
+ * @Description: In User Settings Edit
+ * @FilePath: \code-testing\src\table\table_row\types.ts
+ */
 // Props 定义在这里
 export const rowProps = {
   rowIndex: {
@@ -38,5 +17,3 @@ export const rowProps = {
     default: (): any => ({}),
   },
 }
-
-export type RowPublicProps = IxPublicPropTypes<typeof rowProps>

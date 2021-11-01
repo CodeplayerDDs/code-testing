@@ -1,6 +1,25 @@
+<!--
+ * @Author: your name
+ * @Date: 2021-11-01 13:47:44
+ * @LastEditTime: 2021-11-01 22:49:33
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \code-testing\src\table\table_cell\index.vue
+-->
 <template>
   <td class="table-cell" rowspan="1" colspan="1">
-    <slot />
+    <slot>
+      <template v-if="type === 'bodyCell'">
+        {{ value || '-' }}
+      </template>
+
+      <template v-else>
+        <template>{{ columnCfg.title || '-' }}</template>
+      </template>
+    </slot>
+    <template v-if="columnCfg.enableSort">
+      <span @click="handleSort">{{ curSortText }}</span>
+    </template>
   </td>
 </template>
 
@@ -9,19 +28,60 @@
  * Created by uedc on 2021/10/11.
  */
 
-import { computed, defineComponent, watch, toRef, ref } from '@vue/composition-api'
+import { computed, defineComponent, toRefs, ref } from '@vue/composition-api'
 import { cellProps } from './types'
+import { SortDirTextMap, SortDir } from '../types'
 
 export default defineComponent({
   name: 'TableRow',
   props: cellProps,
-//   setup(props) {
+  setup(props) {
+    const { columnCfg, type, record, value, sortStatus } = toRefs(props)
 
-//     return {
-//       showedData,
-//       tableColumns,
-//     }
-//   },
+    let res = {}
+
+    if (type.value === 'bodyCell') {
+      res = {
+        value,
+        record,
+        columnCfg,
+      }
+    } else {
+      res = {
+        columnCfg,
+      }
+
+      // 当前列开启排序功能
+      if (columnCfg.value.enableSort) {
+        /** 正在以当前列排序 */
+        const isSorting = computed(() => sortStatus!.value!.sortKey === columnCfg.value.dataIndex)
+
+        const curSortText = computed(() => isSorting.value ? SortDirTextMap[sortStatus!.value!.sortDir] : SortDirTextMap[SortDir.none])
+
+        const handleSort = () => {
+          // 如果已经是在当前列排序,切换排序方式
+          if (isSorting.value) {
+            sortStatus!.value!.sortDir = SortDir[(sortStatus!.value!.sortDir + 1) % 3]
+            return
+          }
+
+          // 否则排序列改为当前列，并使用正序排序
+          sortStatus!.value!.sortKey = columnCfg.value.dataIndex
+          sortStatus!.value!.sortDir = SortDir.desc
+        }
+
+        res = {
+          ...res,
+          curSortText,
+          handleSort,
+        }
+      }
+    }
+
+    return {
+      ...res,
+    }
+  },
 })
 
 </script>
