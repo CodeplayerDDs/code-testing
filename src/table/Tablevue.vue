@@ -71,7 +71,10 @@ export default defineComponent({
     TableCell,
     Pager,
   },
-  props: tableProps,
+  props: tableProps
+
+
+  ,
   setup(props) {
     let paging = {}
 
@@ -128,10 +131,8 @@ function usePager<TRecord>(pagingCfg: PagingCfg, showedData: Ref<TRecord[]>, dat
   watch(() => pagingStatus.value.curPage, () => {
     pagingStatus.value.startInd = (pagingStatus.value.curPage - 1) * pagingStatus.value.pageSize
     const endInd = Math.min(pagingStatus.value.startInd + pagingStatus.value.pageSize, data.value.length)
+    debugger
     showedData.value = data.value.slice(pagingStatus.value.startInd, endInd)
-  }, {
-    immediate: true,
-    deep: true,
   })
 
   handlePaging(pagingCfg, pagingStatus, showedData, data.value)

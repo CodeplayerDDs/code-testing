@@ -34,8 +34,8 @@ export type IxPublicPropTypes<O> = O extends object
 // Props 定义在这里
 export const pagingProps = {
   pagingStatus: {
-    type: Object as PropType<Ref<PagingStatus>>,
-    require: true,
+    type: Object as PropType<PagingStatus>,
+    required: true,
   },
 }
 
