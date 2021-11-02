@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-11-01 13:47:44
- * @LastEditTime: 2021-11-02 14:30:33
+ * @LastEditTime: 2021-11-03 00:05:04
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \code-testing\src\table\table_cell\index.vue
@@ -61,7 +61,6 @@ export default defineComponent({
         const curSortText = computed(() => isSorting.value ? SortDirTextMap[sortStatus!.value!.sortDir] : SortDirTextMap[SortDir.none])
 
         const handleSort = () => {
-          // debugger
           // 如果已经是在当前列排序,切换排序方式
           if (isSorting.value) {
             sortStatus!.value!.sortDir = SortDir[SortDir[(sortStatus!.value!.sortDir + 1) % 3]]
@@ -89,5 +88,4 @@ export default defineComponent({
     }
   },
 })
-
 </script>

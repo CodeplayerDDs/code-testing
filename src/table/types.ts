@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-01 13:47:44
- * @LastEditTime: 2021-11-02 23:05:51
+ * @LastEditTime: 2021-11-03 01:42:09
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \code-testing\src\table\types.ts
@@ -102,14 +102,8 @@ export interface SortStatus {
   readonly unsortedData?: any[]
 }
 
-
-
 // Props 定义在这里
 export const tableProps = {
-  test: {
-    type: Boolean as PropType<boolean>,
-    default: false,
-  },
   enableMultiCheck: {
     type: Boolean,
     default: false,

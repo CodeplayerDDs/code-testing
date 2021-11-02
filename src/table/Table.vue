@@ -88,24 +88,31 @@ export default defineComponent({
     let paging = {}
 
     const data = toRef(props, 'data')
+
+    /** 用于显示的数据 */
     const showedData = ref([])
 
     const { tableColumns } = useColumns(props.columns)
 
+    /** 分页状态 */
+    let pagingStatus: PagingStatus
     if (props.enableLocalPaging) {
-      const pagingStatus = usePager(props.pagingCfg, showedData, data)
+      pagingStatus = usePager(props.pagingCfg, showedData, data)
       paging = { pagingStatus }
     }
 
+    /** 显示数据的备份，如果有分页根据分页状态来获取 */
+    const showedDataBak = computed(() => {
+      if (!props.enableLocalPaging) {
+        return cloneDeep(data.value)
+      }
+
+      return cloneDeep(data.value.slice(pagingStatus.startInd, pagingStatus.startInd + pagingStatus.pageSize))
+    })
+
     // 开启排序功能
     const { sortCfg, columns } = toRefs(props)
-    const sorting = useSort(sortCfg, columns, showedData)
-
-    // const sortProp = ref(''),
-    //     sortType = ref('0')
-
-    // 不支持跨页选中
-    // const checkedList = ref<any[]>([])
+    const sorting = useSort(sortCfg, columns, showedData, showedDataBak)
 
     return {
       showedData,
@@ -116,11 +123,11 @@ export default defineComponent({
   },
 })
 
+/** 应用表格列，生成表格列配置 */
 function useColumns(columnsCfg: Column[]) {
-  const tableColumns = ref(computed(() => Array.from(columnsCfg)))
+  const tableColumns = computed(() => cloneDeep(columnsCfg))
 
   // TODO 需要处理一些内置列
-
   // function registryColumn(column) {
   //   tableColumns.value.push(column)
   // }
@@ -132,8 +139,8 @@ function useColumns(columnsCfg: Column[]) {
 }
 
 /** 应用分页功能 */
-function usePager<TRecord>(pagingCfg: PagingCfg, showedData: Ref<TRecord[]>, data: Ref<TRecord[]>): Ref<PagingStatus> {
-  const pagingStatus = ref({
+function usePager<TRecord>(pagingCfg: PagingCfg, showedData: Ref<TRecord[]>, data: Ref<TRecord[]>): PagingStatus {
+  const pagingStatus = reactive({
     curPage: 0,
     totalPage: 0,
     pageSize: pagingCfg.pageSize || 20,
@@ -145,10 +152,10 @@ function usePager<TRecord>(pagingCfg: PagingCfg, showedData: Ref<TRecord[]>, dat
   })
 
   // 当前页变化后，需要重新计算index的开始值，并刷新展示的数据
-  watch(() => pagingStatus.value.curPage, () => {
-    pagingStatus.value.startInd = (pagingStatus.value.curPage - 1) * pagingStatus.value.pageSize
-    const endInd = Math.min(pagingStatus.value.startInd + pagingStatus.value.pageSize, data.value.length)
-    showedData.value = data.value.slice(pagingStatus.value.startInd, endInd)
+  watch(() => pagingStatus.curPage, () => {
+    pagingStatus.startInd = (pagingStatus.curPage - 1) * pagingStatus.pageSize
+    const endInd = Math.min(pagingStatus.startInd + pagingStatus.pageSize, data.value.length)
+    showedData.value = data.value.slice(pagingStatus.startInd, endInd)
   })
 
   handlePaging(pagingCfg, pagingStatus, showedData, data)
@@ -157,35 +164,28 @@ function usePager<TRecord>(pagingCfg: PagingCfg, showedData: Ref<TRecord[]>, dat
 }
 
 /** 当数据变化，需要重新计算分页的总数 */
-function handlePaging<TRecord>(pagingCfg: PagingCfg, pagingStatus: Ref<PagingStatus>, showedData: Ref<TRecord[]>, data: Ref<TRecord[]>) {
+function handlePaging<TRecord>(pagingCfg: PagingCfg, pagingStatus: PagingStatus, showedData: Ref<TRecord[]>, data: Ref<TRecord[]>) {
   if (!data.value || !data.value.length) {
-    pagingStatus.value.totalPage = 0
-    pagingStatus.value.curPage = 0
+    pagingStatus.totalPage = 0
+    pagingStatus.curPage = 0
     return
   }
 
   const isMore = data.value.length % pagingCfg.pageSize > 0
-  pagingStatus.value.totalPage = Math.floor(data.value.length / pagingCfg.pageSize) + (isMore ? 1 : 0)
-  pagingStatus.value.curPage === 0 && (pagingStatus.value.curPage = 1)
+  pagingStatus.totalPage = Math.floor(data.value.length / pagingCfg.pageSize) + (isMore ? 1 : 0)
+  pagingStatus.curPage === 0 && (pagingStatus.curPage = 1)
 }
 
 /** 开启排序功能 */
-function useSort<TRecord> (sortCfg: Ref<SortCfg>, columns: Ref<Column<TRecord>[]>, showedData: Ref<TRecord[]>) {
-  const sortStatus: reactive<SortStatus> = ref({
+function useSort<TRecord> (sortCfg: Ref<SortCfg>, columns: Ref<Column<TRecord>[]>, showedData: Ref<TRecord[]>, showedDataBak: Ref<TRecord[]>) {
+  const sortStatus = reactive({
     sortKey: sortCfg.value.defaultSortKey,
     sortDir: sortCfg.value.defaultSortDir,
-
-    // TODO deep clone
-    unsortedData: showedData,
+    unsortedData: showedDataBak,
   })
 
-  // watch(() => sortStatus.value.sortKey, () => {
-  //   sortStatus.value.sortDir = SortDir.desc
-  // })
-
   const handleSort = () => {
-    debugger
-    const sortKey = sortStatus.value.sortKey
+    const sortKey = sortStatus.sortKey
     if (!sortKey) {
       return
     }
@@ -203,34 +203,25 @@ function useSort<TRecord> (sortCfg: Ref<SortCfg>, columns: Ref<Column<TRecord>[]
 
       bVal = b[sortKey]
       aVal= a[sortKey]
-      // debugger
 
-      if (bVal === aVal) {
-        return 0
-      } else if (bVal > aVal) {
-        return 1
-      }
-
-      return -1
+      return bVal === aVal ? 0 : bVal > aVal ? 1 : -1
     }
 
-    switch(sortStatus.value.sortDir) {
+    switch(sortStatus.sortDir) {
       case SortDir.none:
-        showedData.value.sort((b, a) => sortingFn(b, a))
+        showedData.value = sortStatus.unsortedData!
         break
       case SortDir.desc:
-        showedData.value.sort((b, a) => sortingFn(a, b))
+        showedData.value.sort((b, a) => sortingFn(b, a))
         break
       case SortDir.asc:
-        showedData.value = sortStatus.value.unsortedData!
+        showedData.value.sort((b, a) => sortingFn(a, b))
         break
 
       default:
-        console.error(`Invalide sort dirction: ${sortStatus.value.sortDir}`)
+        console.error(`Invalide sort dirction: ${sortStatus.sortDir}`)
     }
   }
-
-  // watchEffect()
 
   return {
     sortStatus,
