@@ -10,6 +10,7 @@
                         type="headCell"
                         :sortCfg="col.sortCfg"
                         :sortStatus="sortStatus"
+                        @sort="handleSort"
                         :columnCfg="col">
               <!-- <slot v-if="!col.type"
                     :name="`head-${col.dataIndex}`"
@@ -64,12 +65,14 @@ import type {
 
 import type { Ref } from '@vue/composition-api'
 
-import { computed, defineComponent, ref, toRef, toRefs, watch, watchEffect } from '@vue/composition-api'
+import { computed, defineComponent, ref, toRef, toRefs, watch, watchEffect, reactive } from '@vue/composition-api'
 import { SortDir, tableProps } from './types'
 
 import TableRow from './table_row/index.vue'
 import TableCell from './table_cell/index.vue'
 import Pager from './pager/index.vue'
+
+import cloneDeep from 'lodash-es/cloneDeep'
 
 import './table.less'
 
@@ -96,7 +99,7 @@ export default defineComponent({
 
     // 开启排序功能
     const { sortCfg, columns } = toRefs(props)
-    const sortStatus = useSort(sortCfg, columns, showedData)
+    const sorting = useSort(sortCfg, columns, showedData)
 
     // const sortProp = ref(''),
     //     sortType = ref('0')
@@ -108,7 +111,7 @@ export default defineComponent({
       showedData,
       tableColumns,
       ...paging,
-      sortStatus,
+      ...sorting,
     }
   },
 })
@@ -168,7 +171,7 @@ function handlePaging<TRecord>(pagingCfg: PagingCfg, pagingStatus: Ref<PagingSta
 
 /** 开启排序功能 */
 function useSort<TRecord> (sortCfg: Ref<SortCfg>, columns: Ref<Column<TRecord>[]>, showedData: Ref<TRecord[]>) {
-  const sortStatus: Ref<SortStatus> = ref({
+  const sortStatus: reactive<SortStatus> = ref({
     sortKey: sortCfg.value.defaultSortKey,
     sortDir: sortCfg.value.defaultSortDir,
 
@@ -180,7 +183,8 @@ function useSort<TRecord> (sortCfg: Ref<SortCfg>, columns: Ref<Column<TRecord>[]
   //   sortStatus.value.sortDir = SortDir.desc
   // })
 
-  watch(() => sortStatus.value.sortDir, () => {
+  const handleSort = () => {
+    debugger
     const sortKey = sortStatus.value.sortKey
     if (!sortKey) {
       return
@@ -198,8 +202,8 @@ function useSort<TRecord> (sortCfg: Ref<SortCfg>, columns: Ref<Column<TRecord>[]
       }
 
       bVal = b[sortKey]
-      // eval('debugger')
       aVal= a[sortKey]
+      // debugger
 
       if (bVal === aVal) {
         return 0
@@ -218,17 +222,20 @@ function useSort<TRecord> (sortCfg: Ref<SortCfg>, columns: Ref<Column<TRecord>[]
         showedData.value.sort((b, a) => sortingFn(a, b))
         break
       case SortDir.asc:
-        showedData.value = sortStatus.value.unsortedData!.value!
+        showedData.value = sortStatus.value.unsortedData!
         break
 
       default:
         console.error(`Invalide sort dirction: ${sortStatus.value.sortDir}`)
     }
-  })
+  }
 
   // watchEffect()
 
-  return sortStatus
+  return {
+    sortStatus,
+    handleSort,
+  }
 }
 
 </script>

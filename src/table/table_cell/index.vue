@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-11-01 13:47:44
- * @LastEditTime: 2021-11-01 22:49:33
+ * @LastEditTime: 2021-11-02 14:30:33
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \code-testing\src\table\table_cell\index.vue
@@ -15,11 +15,12 @@
 
       <template v-else>
         <template>{{ columnCfg.title || '-' }}</template>
+        <template v-if="columnCfg.enableSort">
+          <span @click="handleSort">{{ curSortText }}</span>
+          <!-- <span>{{ curSortText }}</span> -->
+        </template>
       </template>
     </slot>
-    <template v-if="columnCfg.enableSort">
-      <span @click="handleSort">{{ curSortText }}</span>
-    </template>
   </td>
 </template>
 
@@ -35,7 +36,8 @@ import { SortDirTextMap, SortDir } from '../types'
 export default defineComponent({
   name: 'TableRow',
   props: cellProps,
-  setup(props) {
+  emits: ['sort'],
+  setup(props, { emit }) {
     const { columnCfg, type, record, value, sortStatus } = toRefs(props)
 
     let res = {}
@@ -59,15 +61,19 @@ export default defineComponent({
         const curSortText = computed(() => isSorting.value ? SortDirTextMap[sortStatus!.value!.sortDir] : SortDirTextMap[SortDir.none])
 
         const handleSort = () => {
+          // debugger
           // 如果已经是在当前列排序,切换排序方式
           if (isSorting.value) {
-            sortStatus!.value!.sortDir = SortDir[(sortStatus!.value!.sortDir + 1) % 3]
+            sortStatus!.value!.sortDir = SortDir[SortDir[(sortStatus!.value!.sortDir + 1) % 3]]
+            emit('sort')
             return
           }
 
           // 否则排序列改为当前列，并使用正序排序
           sortStatus!.value!.sortKey = columnCfg.value.dataIndex
           sortStatus!.value!.sortDir = SortDir.desc
+
+          emit('sort')
         }
 
         res = {

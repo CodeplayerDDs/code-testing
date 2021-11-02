@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-01 13:47:44
- * @LastEditTime: 2021-11-01 22:32:04
+ * @LastEditTime: 2021-11-02 23:05:51
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \code-testing\src\table\types.ts
@@ -72,16 +72,16 @@ export type sortFnType<TRecord> = (b: TRecord, a: TRecord) => -1 | 0 | 1
 export const enum SortDir {
   /** 原始数据，没有排序 */
   none = 0,
-  /** 降序 */
-  desc,
   /** 升序 */
+  desc,
+  /** 倒序 */
   asc,
 }
 
 export const SortDirTextMap = {
   [SortDir.none]: '原始',
-  [SortDir.desc]: '正序',
-  [SortDir.asc]: '倒叙',
+  [SortDir.desc]: '升序',
+  [SortDir.asc]: '倒序',
 }
 
 /** 排序相关配置项 */
@@ -99,7 +99,7 @@ export interface SortStatus {
   /** 当前排序方式 */
   sortDir: SortDir
   /** 原始未排序数据 */
-  readonly unsortedData?: Ref<any[]>
+  readonly unsortedData?: any[]
 }
 
 

@@ -1,8 +1,8 @@
 <!--
  * @Author: your name
  * @Date: 2021-11-01 13:47:44
- * @LastEditTime: 2021-11-01 18:30:59
- * @LastEditors: your name
+ * @LastEditTime: 2021-11-02 14:21:02
+ * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \code-testing\demo\App.vue
 -->
@@ -41,7 +41,6 @@ export default defineComponent({
       }, {
         title: '姓名',
         dataIndex: 'name',
-        enableSort: true,
       }, {
         title: '地址',
         dataIndex: 'address',
