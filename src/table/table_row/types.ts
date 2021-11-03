@@ -1,8 +1,8 @@
 /*
  * @Author: your name
  * @Date: 2021-11-01 13:47:44
- * @LastEditTime: 2021-11-01 19:13:28
- * @LastEditors: your name
+ * @LastEditTime: 2021-11-03 21:16:08
+ * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \code-testing\src\table\table_row\types.ts
  */
@@ -14,6 +14,6 @@ export const rowProps = {
   },
   record: {
     type: Object,
-    default: (): any => ({}),
+    default: () => ({}),
   },
 }
