@@ -1,3 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="jest tests" tests="0" failures="0" errors="0" time="4.23">
+<testsuites name="jest tests" tests="2" failures="1" errors="0" time="2.322">
+  <testsuite name="Table" errors="0" failures="1" skipped="0" timestamp="2021-11-03T15:36:19" time="0.951" tests="2">
+    <testcase classname="Table test base render" name="Table test base render" time="0.066">
+    </testcase>
+    <testcase classname="Table test sorting" name="Table test sorting" time="0.034">
+      <failure>Error: expect(received).toHaveLength(expected)
+
+Expected length: 1
+Received length: 0
+Received object: {&quot;selector&quot;: &quot;.paging-item&quot;}
+    at Object.&lt;anonymous&gt; (D:\Code\code-testing\src\__tests__\table.spec.js:66:27)
+    at processTicksAndRejections (node:internal/process/task_queues:96:5)</failure>
+    </testcase>
+  </testsuite>
 </testsuites>

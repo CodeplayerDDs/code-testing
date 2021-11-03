@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-03 20:50:40
- * @LastEditTime: 2021-11-03 20:56:25
+ * @LastEditTime: 2021-11-03 22:24:01
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \code-testing\src\table\hooks\usePaging.ts
@@ -45,7 +45,6 @@ export function handlePaging<TRecord>(pagingCfg: PagingCfg, pagingStatus: Paging
     return
   }
 
-  const isMore = data.value.length % pagingCfg.pageSize > 0
-  pagingStatus.totalPage = Math.floor(data.value.length / pagingCfg.pageSize) + (isMore ? 1 : 0)
+  pagingStatus.totalPage = Math.ceil(data.value.length / pagingCfg.pageSize)
   pagingStatus.curPage === 0 && (pagingStatus.curPage = 1)
 }

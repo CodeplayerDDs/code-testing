@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Table base render 1`] = `
+"<div>
+  <table class=\\"test-table\\">
+    <thead>
+      <tr></tr>
+    </thead>
+    <tbody></tbody>
+    <div class=\\"table-paging-bar\\"><span class=\\"paging-btn disabled\\">上一页</span>
+      <!----> <span class=\\"paging-btn disabled\\">下一页</span></div>
+  </table>
+</div>"
+`;
+
+exports[`Table test base render 1`] = `
+"<div>
+  <table class=\\"test-table\\">
+    <thead>
+      <tr></tr>
+    </thead>
+    <tbody></tbody>
+    <div class=\\"table-paging-bar\\"><span class=\\"paging-btn disabled\\">上一页</span>
+      <!----> <span class=\\"paging-btn disabled\\">下一页</span></div>
+  </table>
+</div>"
+`;

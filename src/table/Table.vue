@@ -70,7 +70,7 @@ import TableRow from './table_row/index.vue'
 import TableCell from './table_cell/index.vue'
 import Pager from './pager/index.vue'
 
-import cloneDeep from 'lodash-es/cloneDeep'
+// import { cloneDeep } from 'lodash-es'
 
 import { useColumns } from './hooks/useColumns'
 import { usePager } from './hooks/usePaging'
@@ -106,10 +106,10 @@ export default defineComponent({
     /** 显示数据的备份，如果有分页根据分页状态来获取 */
     const showedDataBak = computed(() => {
       if (!props.enableLocalPaging) {
-        return cloneDeep(data.value)
+        return [...data.value]
       }
 
-      return cloneDeep(data.value.slice(pagingStatus.startInd, pagingStatus.startInd + pagingStatus.pageSize))
+      return [...data.value.slice(pagingStatus.startInd, pagingStatus.startInd + pagingStatus.pageSize)]
     })
 
     // 开启排序功能

@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-11-01 13:47:44
- * @LastEditTime: 2021-11-02 14:21:02
+ * @LastEditTime: 2021-11-03 23:35:40
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \code-testing\demo\App.vue
@@ -17,8 +17,10 @@
 </template>
 
 <script lang="ts">
-import { TestTable } from '../src/table'
+import TestTable from '../src/table/Table.vue'
 import { defineComponent, ref } from '@vue/composition-api'
+
+import { getData } from './mock'
 
 export default defineComponent({
   name: 'App',
@@ -35,39 +37,21 @@ export default defineComponent({
       columns: [/*{
         type: 'index',
       }, */{
-        title: '日期',
-        dataIndex: 'date',
-        enableSort: true,
-      }, {
-        title: '姓名',
-        dataIndex: 'name',
-      }, {
-        title: '地址',
-        dataIndex: 'address',
-        enableSort: true,
-      }],
-      data: getData(100),
+          title: '日期',
+          dataIndex: 'date',
+          enableSort: true,
+        }, {
+          title: '姓名',
+          dataIndex: 'name',
+        }, {
+          title: '地址',
+          dataIndex: 'address',
+          enableSort: true,
+        }],
+      data: getData(20),
     }
   },
 })
-
-
-function getData (count: number) {
-  const oneDay = 1000*60*60*241
-  const base = {
-    date: new Date(),
-    name: 'Tom',
-    address: 'Adress No. ',
-  }
-
-  return new Array(count).fill(0).map((v, ind) => {
-    return {
-      date: new Date(base.date.getTime() - oneDay * ind).getTime(),
-      name: base.name + (ind + 1),
-      address: base.address + (ind + 1),
-    }
-  })
-}
 </script>
 
 <style lang="less">
