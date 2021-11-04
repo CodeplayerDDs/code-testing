@@ -1,14 +1,14 @@
 <!--
  * @Author: your name
  * @Date: 2021-11-01 13:47:44
- * @LastEditTime: 2021-11-04 11:19:03
+ * @LastEditTime: 2021-11-04 16:11:57
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \code-testing\demo\App.vue
 -->
 <template>
   <div>
-    <TestTable class="dsy-test-table" :pagingCfg="pagingCfg" :enable-local-paging="false" :columns="columns" :origin-data="originData">
+    <TestTable class="dsy-test-table" :enableLocalPaging="false" :columns="columns" :origin-data="originData">
       <template slot="cell-name" slot-scope="{value}">
         v-slot{{ value }}
       </template>
@@ -48,7 +48,7 @@ export default defineComponent({
           dataIndex: 'address',
           enableSort: true,
         }],
-      originData: getData(320),
+      originData: getData(0),
       pagingCfg: {
         pageSize: 40,
       },

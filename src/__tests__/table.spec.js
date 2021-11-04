@@ -1,13 +1,12 @@
 /*
  * @Author: your name
  * @Date: 2021-11-01 13:47:44
- * @LastEditTime: 2021-11-04 11:08:49
+ * @LastEditTime: 2021-11-04 16:25:56
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \code-testing\src\__tests__\table.spec.tsx
  */
 import { mount } from '@vue/test-utils'
-import Vue from 'vue'
 import { TestTable } from '../table'
 import { getData } from '../../demo/mock'
 
@@ -28,9 +27,9 @@ const columnsCfg = [{
 
 function getPagingProps(cfg) {
   return {
-    ...cfg,
     columns: columnsCfg,
     enableLocalPaging: true,
+    ...cfg,
   }
 }
 
@@ -42,19 +41,15 @@ function getSortItem (wrapper) {
   }
 }
 
-async function relaySecond(time = 1) {
-  await new Promise((resolve, reject)=> {
-    setTimeout(()=>resolve(true), time * 1000)
-  })
-}
-
 describe('Table', () => {
   const TableMount = options => mount(TestTable, options)
 
   test('test base render', () => {
     const wrapper = TableMount({
-      columns: columnsCfg,
-      originData: getData(20),
+      propsData: {
+        columns: columnsCfg,
+        originData: getData(20),
+      },
     })
 
     expect(wrapper.html()).toMatchSnapshot()
@@ -63,16 +58,6 @@ describe('Table', () => {
       wrapper.vm.$destroy()
     }).not.toThrow()
   })
-
-  // test('test props', () => {
-  //   const wrapper = TableMount({
-  //     propsData: {
-  //       test: true,
-  //     },
-  //   })
-
-  //   expect(wrapper.find('.test-class').exists()).toBeTruthy()
-  // })
 
   test('test paging empty', async () => {
     const wrapper = TableMount()
@@ -96,7 +81,6 @@ describe('Table', () => {
   })
 
   test('test paging disable', async () => {
-    const wrapper = TableMount()
 
     /** 测空数据分数个数、基本分页功能 */
     const pageZero = 0
@@ -105,15 +89,16 @@ describe('Table', () => {
       enableLocalPaging: false,
     }
 
-    await wrapper.setProps(getPagingProps(pageZeroProp))
+    const wrapper = TableMount({
+      propsData: getPagingProps(pageZeroProp),
+    })
 
     // 出现分页条 basic
     const PagingBar = wrapper.findAll('.table-paging-bar')
-    expect(PagingBar).toBeFalsy()
+    expect(PagingBar).toHaveLength(0)
   })
 
   test('test paging defalt size', async () => {
-    const wrapper = TableMount()
 
     /** 测默认页大小 */
     const pageDefault = 2
@@ -122,9 +107,9 @@ describe('Table', () => {
       // empty pagingCfg, using DEFAULT_PAGING_SIZE
     }
 
-    await wrapper.setProps(getPagingProps(pageDefaultProp))
-
-    await relaySecond()
+    const wrapper = TableMount({
+      propsData: getPagingProps(pageDefaultProp),
+    })
 
     // 默认页数是否正确
     const allPagingItem = wrapper.findAll('.paging-item')
@@ -132,8 +117,6 @@ describe('Table', () => {
   })
 
   test('test paging page 8', async () => {
-    const wrapper = TableMount()
-
     /** 8页翻页 */
     const page8 = 8
     const pageSize40 = 40
@@ -144,18 +127,20 @@ describe('Table', () => {
       },
     }
 
-    await wrapper.setProps(getPagingProps(page8Prop))
+    const wrapper = TableMount({
+      propsData: getPagingProps(page8Prop),
+    })
 
     const allPagingItem = wrapper.findAll('.paging-item')
     expect(allPagingItem).toHaveLength(page8)
   })
 
   test('test sorting: no sort item', async () => {
-    const wrapper = TableMount()
-
-    await wrapper.setProps({
-      columns: columnsCfg,
-      originData: getData(20),
+    const wrapper = TableMount({
+      propsData: {
+        columns: columnsCfg,
+        originData: getData(20),
+      },
     })
 
     const sortItem = getSortItem(wrapper)
@@ -166,27 +151,23 @@ describe('Table', () => {
   })
 
   test('test sorting: to sort item', async () => {
-    const wrapper = TableMount()
-
-    await wrapper.setProps({
-      columns: [{
-        title: '日期',
-        dataIndex: 'date',
-        enableSort: true,
-      }, {
-        title: '姓名',
-        dataIndex: 'name',
-      }, {
-        title: '地址',
-        dataIndex: 'address',
-        enableSort: true,
-      }],
-      originData: getData(20),
+    const wrapper = TableMount({
+      propsData: {
+        columns: [{
+          title: '日期',
+          dataIndex: 'date',
+          enableSort: true,
+        }, {
+          title: '姓名',
+          dataIndex: 'name',
+        }, {
+          title: '地址',
+          dataIndex: 'address',
+          enableSort: true,
+        }],
+        originData: getData(20),
+      },
     })
-
-    expect(wrapper.html()).toMatchSnapshot()
-
-    await relaySecond()
 
     const sortItem = getSortItem(wrapper)
 
@@ -196,29 +177,34 @@ describe('Table', () => {
   })
 
   test('test sorting: sort action', async () => {
-    const wrapper = TableMount()
-
-    await wrapper.setProps({
-      columns: [{
-        title: '日期',
-        dataIndex: 'date',
-        enableSort: true,
-      }, {
-        title: '姓名',
-        dataIndex: 'name',
-      }, {
-        title: '地址',
-        dataIndex: 'address',
-        enableSort: true,
-      }],
-      originData: getData(20),
+    const wrapper = TableMount({
+      propsData: {
+        columns: [{
+          title: '日期',
+          dataIndex: 'date',
+          enableSort: true,
+        }, {
+          title: '姓名',
+          dataIndex: 'name',
+        }, {
+          title: '地址',
+          dataIndex: 'address',
+          enableSort: true,
+        }],
+        originData: getData(20),
+      },
     })
 
     const sortItem = getSortItem(wrapper)
 
-    expect(sortItem[SortDir.none]).toHaveLength(2)
-    expect(sortItem[SortDir.desc]).toHaveLength(0)
-    expect(sortItem[SortDir.asc]).toHaveLength(0)
+    const aWrapper = sortItem[SortDir.none].wrappers[0]
+    aWrapper.trigger('click')
+    expect(wrapper.html()).toMatchSnapshot()
+    aWrapper.trigger('click')
+    expect(wrapper.html()).toMatchSnapshot()
+    aWrapper.trigger('click')
+    expect(wrapper.html()).toMatchSnapshot()
+    // aItem
   })
   // await firstWrapper.trigger('click')
 

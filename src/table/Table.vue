@@ -24,7 +24,7 @@
       </thead>
 
       <!-- 表格主体 -->
-      <tbody>
+      <tbody class="table-body">
         <table-row v-for="(rowData, rowKey) in showedData" :key="`table-row-${rowKey}`">
           <table-cell v-for="(col, cellKey) in tableColumns"
                       :key="`table-cell-${cellKey}`"
@@ -46,7 +46,7 @@
       </tbody>
 
       <!-- 底部分页 -->
-      <slot v-if="enableLocalPaging"
+      <slot v-if="enableLocalPagingProp"
             name="pager"
             :paging-status="pagingStatus"
       >
@@ -90,24 +90,23 @@ export default defineComponent({
     let paging = {}
 
     const data = toRef(props, 'originData')
-    const enableLocalPaging = toRef(props, 'enableLocalPaging')
+    const enableLocalPagingProp = toRef(props, 'enableLocalPaging')
 
     /** 用于显示的数据 */
-    const showedData = ref([])
-    showedData.value = data.value
+    const showedData = ref([...data.value])
 
     const { tableColumns } = useColumns(props.columns)
 
     /** 分页状态 */
     let pagingStatus: PagingStatus
-    if (enableLocalPaging.value) {
+    if (enableLocalPagingProp.value) {
       pagingStatus = usePager(props.pagingCfg, showedData, data)
       paging = { pagingStatus }
     }
 
     /** 显示数据的备份，如果有分页根据分页状态来获取 */
     const showedDataBak = computed(() => {
-      if (!enableLocalPaging.value) {
+      if (!enableLocalPagingProp.value) {
         return [...data.value]
       }
 
@@ -121,7 +120,7 @@ export default defineComponent({
     return {
       showedData,
       tableColumns,
-      enableLocalPaging,
+      enableLocalPagingProp,
       ...paging,
       ...sorting,
     }
