@@ -58,6 +58,8 @@ export interface PagingCfg {
   pageSize: number
 }
 
+export const DEFAULT_PAGING_SIZE = 20
+
 /** 分页相关状态集合 */
 export interface PagingStatus {
   pageSize: number
@@ -123,7 +125,7 @@ export const tableProps = {
   pagingCfg: {
     type: Object as PropType<PagingCfg>,
     default: ():PagingCfg => ({
-      pageSize: 20,
+      pageSize: DEFAULT_PAGING_SIZE,
     }),
   },
   sortCfg: {

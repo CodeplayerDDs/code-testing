@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-11-01 13:47:44
- * @LastEditTime: 2021-11-03 00:05:04
+ * @LastEditTime: 2021-11-04 08:27:06
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \code-testing\src\table\table_cell\index.vue
@@ -14,10 +14,9 @@
       </template>
 
       <template v-else>
-        <template>{{ columnCfg.title || '-' }}</template>
+        {{ columnCfg.title || '-' }}
         <template v-if="columnCfg.enableSort">
-          <span @click="handleSort">{{ curSortText }}</span>
-          <!-- <span>{{ curSortText }}</span> -->
+          <span :class="curSortCls" @click="handleSort">{{ curSortText }}</span>
         </template>
       </template>
     </slot>
@@ -30,7 +29,7 @@
  */
 
 import { computed, defineComponent, toRefs, ref } from '@vue/composition-api'
-import { cellProps } from './types'
+import { cellProps, SortDirClsMap } from './types'
 import { SortDirTextMap, SortDir } from '../types'
 
 export default defineComponent({
@@ -60,6 +59,8 @@ export default defineComponent({
 
         const curSortText = computed(() => isSorting.value ? SortDirTextMap[sortStatus!.value!.sortDir] : SortDirTextMap[SortDir.none])
 
+        const curSortCls = computed(() => isSorting.value ? SortDirClsMap[sortStatus!.value!.sortDir] : SortDirClsMap[SortDir.none])
+
         const handleSort = () => {
           // 如果已经是在当前列排序,切换排序方式
           if (isSorting.value) {
@@ -79,6 +80,7 @@ export default defineComponent({
           ...res,
           curSortText,
           handleSort,
+          curSortCls,
         }
       }
     }

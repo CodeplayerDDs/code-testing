@@ -1,14 +1,14 @@
 <!--
  * @Author: your name
  * @Date: 2021-11-01 13:47:44
- * @LastEditTime: 2021-11-03 23:35:40
+ * @LastEditTime: 2021-11-04 02:00:53
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \code-testing\demo\App.vue
 -->
 <template>
   <div>
-    <TestTable class="dsy-test-table" enable-multi-check enable-local-paging :test="test" :columns="columns" :data="data">
+    <TestTable class="dsy-test-table" :pagingCfg="pagingCfg" enable-local-paging :columns="columns" :data="data">
       <template slot="cell-name" slot-scope="{value}">
         v-slot{{ value }}
       </template>
@@ -48,7 +48,10 @@ export default defineComponent({
           dataIndex: 'address',
           enableSort: true,
         }],
-      data: getData(20),
+      data: getData(320),
+      pagingCfg: {
+        pageSize: 40,
+      },
     }
   },
 })
