@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-01 13:47:44
- * @LastEditTime: 2021-11-04 09:31:02
+ * @LastEditTime: 2021-11-04 11:08:49
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \code-testing\src\__tests__\table.spec.tsx
@@ -36,10 +36,16 @@ function getPagingProps(cfg) {
 
 function getSortItem (wrapper) {
   return {
-    [SortDir.none]: wrapper.findAll(SortDirClsMap[SortDir.none]),
-    [SortDir.desc]: wrapper.findAll(SortDirClsMap[SortDir.desc]),
-    [SortDir.asc]: wrapper.findAll(SortDirClsMap[SortDir.asc]),
+    [SortDir.none]: wrapper.findAll('.' + SortDirClsMap[SortDir.none]),
+    [SortDir.desc]: wrapper.findAll('.' + SortDirClsMap[SortDir.desc]),
+    [SortDir.asc]: wrapper.findAll('.' + SortDirClsMap[SortDir.asc]),
   }
+}
+
+async function relaySecond(time = 1) {
+  await new Promise((resolve, reject)=> {
+    setTimeout(()=>resolve(true), time * 1000)
+  })
 }
 
 describe('Table', () => {
@@ -48,7 +54,7 @@ describe('Table', () => {
   test('test base render', () => {
     const wrapper = TableMount({
       columns: columnsCfg,
-      data: getData(20),
+      originData: getData(20),
     })
 
     expect(wrapper.html()).toMatchSnapshot()
@@ -74,7 +80,7 @@ describe('Table', () => {
     /** 测空数据分数个数、基本分页功能 */
     const pageZero = 0
     const pageZeroProp = {
-      data: getData(pageZero),
+      originData: getData(pageZero),
       // pagingCfg 不重要
     }
 
@@ -89,17 +95,36 @@ describe('Table', () => {
     expect(allPagingItem).toHaveLength(pageZero)
   })
 
+  test('test paging disable', async () => {
+    const wrapper = TableMount()
+
+    /** 测空数据分数个数、基本分页功能 */
+    const pageZero = 0
+    const pageZeroProp = {
+      originData: getData(pageZero),
+      enableLocalPaging: false,
+    }
+
+    await wrapper.setProps(getPagingProps(pageZeroProp))
+
+    // 出现分页条 basic
+    const PagingBar = wrapper.findAll('.table-paging-bar')
+    expect(PagingBar).toBeFalsy()
+  })
+
   test('test paging defalt size', async () => {
     const wrapper = TableMount()
 
     /** 测默认页大小 */
     const pageDefault = 2
     const pageDefaultProp = {
-      data: getData(pageDefault * DEFAULT_PAGING_SIZE),
+      originData: getData(pageDefault * DEFAULT_PAGING_SIZE),
       // empty pagingCfg, using DEFAULT_PAGING_SIZE
     }
 
     await wrapper.setProps(getPagingProps(pageDefaultProp))
+
+    await relaySecond()
 
     // 默认页数是否正确
     const allPagingItem = wrapper.findAll('.paging-item')
@@ -113,7 +138,7 @@ describe('Table', () => {
     const page8 = 8
     const pageSize40 = 40
     const page8Prop = {
-      data: getData(page8 * pageSize40),
+      originData: getData(page8 * pageSize40),
       pagingCfg: {
         pageSize: pageSize40,
       },
@@ -130,7 +155,7 @@ describe('Table', () => {
 
     await wrapper.setProps({
       columns: columnsCfg,
-      data: getData(20),
+      originData: getData(20),
     })
 
     const sortItem = getSortItem(wrapper)
@@ -156,8 +181,12 @@ describe('Table', () => {
         dataIndex: 'address',
         enableSort: true,
       }],
-      data: getData(20),
+      originData: getData(20),
     })
+
+    expect(wrapper.html()).toMatchSnapshot()
+
+    await relaySecond()
 
     const sortItem = getSortItem(wrapper)
 
@@ -182,7 +211,7 @@ describe('Table', () => {
         dataIndex: 'address',
         enableSort: true,
       }],
-      data: getData(20),
+      originData: getData(20),
     })
 
     const sortItem = getSortItem(wrapper)

@@ -1,14 +1,14 @@
 /*
  * @Author: your name
  * @Date: 2021-11-03 20:50:40
- * @LastEditTime: 2021-11-04 01:58:09
+ * @LastEditTime: 2021-11-04 10:47:21
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \code-testing\src\table\hooks\usePaging.ts
  */
 
 import type { Ref } from '@vue/composition-api'
-import type { PagingCfg, pagingStatus } from '../types'
+import type { PagingCfg, PagingStatus } from '../types'
 
 import { reactive, watch } from '@vue/composition-api'
 

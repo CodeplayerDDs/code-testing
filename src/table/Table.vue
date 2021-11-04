@@ -2,7 +2,7 @@
   <div>
     <table class="test-table">
       <!-- 表头 -->
-      <thead>
+      <thead class="table-header">
         <tr>
           <slot name="table-head">
             <table-cell v-for="(col, key) in tableColumns"
@@ -89,23 +89,25 @@ export default defineComponent({
   setup(props) {
     let paging = {}
 
-    const data = toRef(props, 'data')
+    const data = toRef(props, 'originData')
+    const enableLocalPaging = toRef(props, 'enableLocalPaging')
 
     /** 用于显示的数据 */
     const showedData = ref([])
+    showedData.value = data.value
 
     const { tableColumns } = useColumns(props.columns)
 
     /** 分页状态 */
     let pagingStatus: PagingStatus
-    if (props.enableLocalPaging) {
+    if (enableLocalPaging.value) {
       pagingStatus = usePager(props.pagingCfg, showedData, data)
       paging = { pagingStatus }
     }
 
     /** 显示数据的备份，如果有分页根据分页状态来获取 */
     const showedDataBak = computed(() => {
-      if (!props.enableLocalPaging) {
+      if (!enableLocalPaging.value) {
         return [...data.value]
       }
 
@@ -119,6 +121,7 @@ export default defineComponent({
     return {
       showedData,
       tableColumns,
+      enableLocalPaging,
       ...paging,
       ...sorting,
     }

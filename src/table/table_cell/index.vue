@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-11-01 13:47:44
- * @LastEditTime: 2021-11-04 08:27:06
+ * @LastEditTime: 2021-11-04 10:31:22
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \code-testing\src\table\table_cell\index.vue
@@ -13,12 +13,15 @@
         {{ value || '-' }}
       </template>
 
+
       <template v-else>
+        <span class="dsy-test-head"></span>
         {{ columnCfg.title || '-' }}
         <template v-if="columnCfg.enableSort">
-          <span :class="curSortCls" @click="handleSort">{{ curSortText }}</span>
+          <span class="dsy-test" :class="curSortCls" @click="handleSort">{{ curSortText }}</span>
         </template>
       </template>
+      <span class="dsy-test-default"></span>
     </slot>
   </td>
 </template>
@@ -28,9 +31,9 @@
  * Created by uedc on 2021/10/11.
  */
 
-import { computed, defineComponent, toRefs, ref } from '@vue/composition-api'
-import { cellProps, SortDirClsMap } from './types'
-import { SortDirTextMap, SortDir } from '../types'
+import { computed, defineComponent, toRefs } from '@vue/composition-api'
+import { SortDirClsMap, cellProps } from './types'
+import { SortDir, SortDirTextMap } from '../types'
 
 export default defineComponent({
   name: 'TableRow',

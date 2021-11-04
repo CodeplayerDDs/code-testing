@@ -1,40 +1,87 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="jest tests" tests="7" failures="3" errors="0" time="6.163">
-  <testsuite name="Table" errors="0" failures="3" skipped="0" timestamp="2021-11-04T01:31:35" time="2.637" tests="7">
-    <testcase classname="Table test base render" name="Table test base render" time="0.118">
+<testsuites name="jest tests" tests="8" failures="5" errors="0" time="28.296">
+  <testsuite name="Table" errors="0" failures="5" skipped="0" timestamp="2021-11-04T03:06:57" time="24.646" tests="8">
+    <testcase classname="Table test base render" name="Table test base render" time="0.054">
+      <failure>Error: expect(received).toMatchSnapshot()
+
+Snapshot name: `Table test base render 1`
+
+- Snapshot  - 1
++ Received  + 1
+
+@@ -1,8 +1,8 @@
+  &lt;div&gt;
+    &lt;table class=&quot;test-table&quot;&gt;
+-     &lt;thead&gt;
++     &lt;thead class=&quot;table-header&quot;&gt;
+        &lt;tr&gt;&lt;/tr&gt;
+      &lt;/thead&gt;
+      &lt;tbody&gt;&lt;/tbody&gt;
+      &lt;div class=&quot;table-paging-bar&quot;&gt;&lt;span class=&quot;paging-btn disabled&quot;&gt;上一页&lt;/span&gt;
+        &lt;!----&gt; &lt;span class=&quot;paging-btn disabled&quot;&gt;下一页&lt;/span&gt;&lt;/div&gt;
+    at Object.&lt;anonymous&gt; (D:\Codes\code-testing\src\__tests__\table.spec.js:60:28)
+    at Promise.then.completed (D:\Codes\code-testing\node_modules\jest-circus\build\utils.js:390:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (D:\Codes\code-testing\node_modules\jest-circus\build\utils.js:315:10)
+    at _callCircusTest (D:\Codes\code-testing\node_modules\jest-circus\build\run.js:218:40)
+    at processTicksAndRejections (node:internal/process/task_queues:96:5)
+    at _runTest (D:\Codes\code-testing\node_modules\jest-circus\build\run.js:155:3)
+    at _runTestsForDescribeBlock (D:\Codes\code-testing\node_modules\jest-circus\build\run.js:66:9)
+    at _runTestsForDescribeBlock (D:\Codes\code-testing\node_modules\jest-circus\build\run.js:60:9)
+    at run (D:\Codes\code-testing\node_modules\jest-circus\build\run.js:25:3)
+    at runAndTransformResultsToJestFormat (D:\Codes\code-testing\node_modules\jest-circus\build\legacy-code-todo-rewrite\jestAdapterInit.js:167:21)
+    at jestAdapter (D:\Codes\code-testing\node_modules\jest-circus\build\legacy-code-todo-rewrite\jestAdapter.js:82:19)
+    at runTestInternal (D:\Codes\code-testing\node_modules\jest-runner\build\runTest.js:389:16)
+    at runTest (D:\Codes\code-testing\node_modules\jest-runner\build\runTest.js:475:34)
+    at TestRunner.runTests (D:\Codes\code-testing\node_modules\jest-runner\build\index.js:111:12)
+    at TestScheduler.scheduleTests (D:\Codes\code-testing\node_modules\@jest\core\build\TestScheduler.js:333:13)
+    at runJest (D:\Codes\code-testing\node_modules\@jest\core\build\runJest.js:387:19)
+    at _run10000 (D:\Codes\code-testing\node_modules\@jest\core\build\cli\index.js:320:7)
+    at runCLI (D:\Codes\code-testing\node_modules\@jest\core\build\cli\index.js:173:3)
+    at Object.run (D:\Codes\code-testing\node_modules\jest-cli\build\cli\index.js:155:37)</failure>
     </testcase>
-    <testcase classname="Table test paging empty" name="Table test paging empty" time="0.024">
+    <testcase classname="Table test paging empty" name="Table test paging empty" time="0.037">
     </testcase>
-    <testcase classname="Table test paging defalt size" name="Table test paging defalt size" time="0.016">
+    <testcase classname="Table test paging disable" name="Table test paging disable" time="0.015">
+      <failure>Error: expect(received).toBeFalsy()
+
+Received: {&quot;selector&quot;: &quot;.table-paging-bar&quot;}
+    at Object.&lt;anonymous&gt; (D:\Codes\code-testing\src\__tests__\table.spec.js:112:23)
+    at processTicksAndRejections (node:internal/process/task_queues:96:5)</failure>
     </testcase>
-    <testcase classname="Table test paging page 8" name="Table test paging page 8" time="0.05">
+    <testcase classname="Table test paging defalt size" name="Table test paging defalt size" time="1.039">
+    </testcase>
+    <testcase classname="Table test paging page 8" name="Table test paging page 8" time="0.043">
       <failure>Error: expect(received).toHaveLength(expected)
 
 Expected length: 8
 Received length: 16
 Received object: {&quot;selector&quot;: &quot;.paging-item&quot;}
-    at Object.&lt;anonymous&gt; (D:\Codes\code-testing\src\__tests__\table.spec.js:125:27)
-    at processTicksAndRejections (node:internal/process/task_queues:96:5)</failure>
+    at Object.&lt;anonymous&gt; (D:\Codes\code-testing\src\__tests__\table.spec.js:150:27)</failure>
     </testcase>
-    <testcase classname="Table test sorting: no sort item" name="Table test sorting: no sort item" time="0.035">
+    <testcase classname="Table test sorting: no sort item" name="Table test sorting: no sort item" time="0.019">
     </testcase>
-    <testcase classname="Table test sorting: to sort item" name="Table test sorting: to sort item" time="0.036">
+    <testcase classname="Table test sorting: to sort item" name="Table test sorting: to sort item" time="20.946">
       <failure>Error: expect(received).toHaveLength(expected)
 
 Expected length: 2
 Received length: 0
-Received object: {&quot;selector&quot;: &quot;table-cell_sort-item--none&quot;}
-    at Object.&lt;anonymous&gt; (D:\Codes\code-testing\src\__tests__\table.spec.js:164:36)
-    at processTicksAndRejections (node:internal/process/task_queues:96:5)</failure>
+Received object: {&quot;selector&quot;: &quot;.table-cell_sort-item--none&quot;}
+    at Object.&lt;anonymous&gt; (D:\Codes\code-testing\src\__tests__\table.spec.js:199:36)
+    at runNextTicks (node:internal/process/task_queues:61:5)
+    at listOnTimeout (node:internal/timers:526:9)
+    at processTimers (node:internal/timers:500:7)</failure>
     </testcase>
-    <testcase classname="Table test sorting: sort action" name="Table test sorting: sort action" time="0.029">
+    <testcase classname="Table test sorting: sort action" name="Table test sorting: sort action" time="0.028">
       <failure>Error: expect(received).toHaveLength(expected)
 
 Expected length: 2
 Received length: 0
-Received object: {&quot;selector&quot;: &quot;table-cell_sort-item--none&quot;}
-    at Object.&lt;anonymous&gt; (D:\Codes\code-testing\src\__tests__\table.spec.js:190:36)
-    at processTicksAndRejections (node:internal/process/task_queues:96:5)</failure>
+Received object: {&quot;selector&quot;: &quot;.table-cell_sort-item--none&quot;}
+    at Object.&lt;anonymous&gt; (D:\Codes\code-testing\src\__tests__\table.spec.js:225:36)
+    at runNextTicks (node:internal/process/task_queues:61:5)
+    at listOnTimeout (node:internal/timers:526:9)
+    at processTimers (node:internal/timers:500:7)</failure>
     </testcase>
   </testsuite>
 </testsuites>

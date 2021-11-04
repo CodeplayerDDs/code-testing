@@ -25,3 +25,18 @@ exports[`Table test base render 1`] = `
   </table>
 </div>"
 `;
+
+exports[`Table test sorting: to sort item 1`] = `
+"<div>
+  <table class=\\"test-table\\">
+    <thead class=\\"table-header\\">
+      <tr></tr>
+    </thead>
+    <tbody></tbody>
+    <div class=\\"table-paging-bar\\"><span class=\\"paging-btn disabled\\">上一页</span>
+      <div class=\\"paging-item_wrapper\\"><span class=\\"paging-item activated\\">
+      1
+    </span></div> <span class=\\"paging-btn disabled\\">下一页</span></div>
+  </table>
+</div>"
+`;
